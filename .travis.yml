@@ -1,0 +1,45 @@
+sudo: required
+language: scala
+dist: precise
+cache:
+  directories:
+    - $HOME/.ivy2
+    - $HOME/spark
+    - $HOME/.cache/pip
+    - $HOME/.pip-cache
+    - $HOME/.sbt/launchers
+scala:
+  - 2.11.8
+jdk:
+  - oraclejdk8
+
+addons:
+  apt:
+    packages:
+      - axel
+
+before_install:
+  - export PATH=$HOME/.local/bin:$PATH
+
+install:
+  # Download apache spark
+  - "[ -f spark ] || mkdir spark && cd spark && axel http://www-us.apache.org/dist/spark/spark-2.3.0/spark-2.3.0-bin-hadoop2.7.tgz && cd .."
+  - "tar -xf ./spark/spark-2.2.1-bin-hadoop2.7.tgz"
+  - "export SPARK_HOME=`pwd`/spark-2.2.1-bin-hadoop2.7"
+  - echo "spark.yarn.jars=$SPARK_HOME/jars/*.jar" > $SPARK_HOME/conf/spark-defaults.conf
+  # Install Python deps.
+  # The conda installation steps here are based on http://conda.pydata.org/docs/travis.html
+  - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+  - deps='pip requests nose sphinx pep8 coverage'
+  - conda create -p $HOME/py --yes $deps "python=2.7"
+  - export PATH=$HOME/py/bin:$PATH
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION clean compile test
