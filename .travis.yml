@@ -1,6 +1,5 @@
 sudo: required
 language: scala
-dist: precise
 cache:
   directories:
     - $HOME/.ivy2
@@ -46,4 +45,5 @@ script:
   - sbt ++$TRAVIS_SCALA_VERSION clean compile test
   - cd .. && cd spark-test-travis-ci-second
   - echo "first project done"
+  - pwd
   - sbt ++$TRAVIS_SCALA_VERSION clean compile test
