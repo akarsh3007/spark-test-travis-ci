@@ -45,5 +45,5 @@ install:
 script:
   - sbt ++$TRAVIS_SCALA_VERSION clean compile test
   - cd .. && cd spark-test-travis-ci-second
-  - ehco "first project done"
+  - echo "first project done"
   - sbt ++$TRAVIS_SCALA_VERSION clean compile test
